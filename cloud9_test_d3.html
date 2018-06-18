@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    
+    </head>
+    <body>
+        <!-- Test script and styling made when initially learning how to use D3.js(https://d3js.org/) -->
+        <!-- Tested via Cloud9(https://ide.c9.io). If you create a workspace, and copy paste this code, it should properly execute and provide a base grouped bar graph-->
+        <style type="text/css">
+            /*Tooltip Styling*/
+            .tooltip {
+                background-color: #000;
+                border-radius: 5px;
+                font-size: 13px;
+                padding: 10px;
+                position: absolute;
+                text-align: left;
+                width: 130px;
+            }
+            .tooltip-rect {
+                background-color: #fff;
+                border: 1px solid white;
+                display: inline;
+            }
+        </style>
+        <svg></svg>
+        <script src="https://d3js.org/d3.v4.min.js"></script>
+        <script type="text/javascript">
+            //sample data
+            const data =
+                [{
+                  "month": "January",
+                  "one": 68,
+                  "two": 62,
+                  "three": 53,
+                  "four": 43,
+                  "five": 56
+                }, {
+                  "month": "February",
+                  "one": 67,
+                  "two": 52,
+                  "three": 49,
+                  "four": 58,
+                  "five": 41
+                }, {
+                  "month": "March",
+                  "one": 57,
+                  "two": 75,
+                  "three": 55,
+                  "four": 47,
+                  "five": 56
+                }, {
+                  "month": "April",
+                  "one": 74,
+                  "two": 54,
+                  "three": 50,
+                  "four": 72,
+                  "five": 53
+                }, {
+                  "month": "May",
+                  "one": 67,
+                  "two": 44,
+                  "three": 44,
+                  "four": 57,
+                  "five": 48
+                }];
+            
+            //
+            const graphMargin = {
+                top: 20,
+                right: 50,
+                bottom: 20,
+                left: 20
+            };
+            
+            //properties for graph schema
+            const schema = {
+                //parent svg properties
+                svg: {
+                    autoGenerate: true,
+                    height: 700,
+                    width: 900
+                },
+                
+                //properties of each child bar
+                bar: {
+                    autoGenerate: true,
+                    height: 20,
+                    dataLabels: {
+                        showLabel: true,
+                        location: "inside_start"
+                    }
+                }
+            };
+            
+            //filters out month properties of data array's objects, leaving only the numerical values.
+            var filterData = function (data) {
+                let result = [];
+                
+                for(let prop in data) {
+                    if (prop != "month") {
+                        result.push(data[prop]);
+                    }
+                }
+                
+                return result;
+            };
+            
+            //return highest value of each set in data array
+            var getDataMax = function (data) {
+                let potentialMax = 0;
+                let currentMax = 0;
+                for (let i=0; i < data.length; i++) {
+                    potentialMax = d3.max(filterData(data[i]), function (d) {console.log(d); return d;});
+                    if (currentMax < potentialMax) {
+                        currentMax = potentialMax;
+                    }
+                }
+                
+                return currentMax;
+            };
+            
+            //sets svg height based on schema's svg properties
+            var setSvgHeight = function(data, svgSchema) {
+                let groupSize = (((Object.keys(data[0]).length-1) * (setBarHeight(data, schema.bar) + 1)) - 1);
+                if(svgSchema.autoGenerate) {
+                    return (groupSize*data.length) + (35*(data.length-1)) + graphMargin.top + graphMargin.bottom;
+                } else {
+                    return svgSchema.height;
+                }
+            };
+            
+            //sets svg width based on schema's svg properties
+            var setSvgWidth = function(data, svgSchema) {
+                if(svgSchema.autoGenerate) {
+                    if(getDataMax(data) <= 120 && getDataMax(data) >= 60) {
+                        return (getDataMax(data)*10);
+                    } else if (getDataMax(data) > 110) {
+                        return 1100;
+                    } else if (getDataMax(data) < 60) {
+                        return 600;
+                    }
+                } else {
+                    return svgSchema.width;
+                }
+            };
+            
+            //dynamically regulates bar height based on number of bars, along with schema's bar properties
+            var setBarHeight = function(data, barSchema) {
+                if(barSchema.autoGenerate) {
+                    let previousObjectLength;
+                    
+                    for (let i=0; i<data.length; i++) {
+                        if(Object.keys(data[i]).length <= 6 && Object.keys(data[i]).length >= 4){
+                            if(i == 0) {
+                            previousObjectLength = (Object.keys(data[i]).length);
+                        }
+                            else if(previousObjectLength != (Object.keys(data[i]).length)) {
+                                console.error("The provided schema is inconsistently structured. Please fix and try again.");
+                                return 0;
+                            }
+                        } else if (Object.keys(data[i]).length > 6) {
+                            return 20;
+                        } else if (Object.keys(data[i]).length < 4) {
+                            return (100/3);
+                        }
+                    }
+                    
+                    return (100/(previousObjectLength-1));
+                    
+                } else {
+                    return barSchema.height;
+                }
+            };
+            
+            //sets actual graph height & width based on predetermined margins & setSvgHeight's returned value
+            var graphHeight = setSvgHeight(data, schema.svg) - graphMargin.top - graphMargin.bottom;
+            var graphWidth = setSvgWidth(data, schema.svg) - (graphMargin.left)*2 - graphMargin.right;
+
+            //returns array of y axis keys, based on month values in each set of data array
+            var getKeys = function(data) {
+                let keys = [];
+    
+                for (let i=0;i<data.length;i++) {
+                    keys.push(data[i].month);
+                }
+                
+                return keys;
+            };
+            
+            //create parent svg
+            var svg = d3.select("svg").attr("width", setSvgWidth(data, schema.svg)).attr("height", setSvgHeight(data, schema.svg));
+            
+            //create group element, representing the bars of the graph
+            var g = svg.append("g").attr("transform", "translate(" + graphMargin.left*2.5 + "," + graphMargin.top + ")");
+
+            //set x-axis scaling
+            var xScale = d3.scaleLinear()
+                           .domain([0, getDataMax(data)])
+                           .range([0, graphWidth]);
+            
+            // set y-axis scaling
+            var yScale = d3.scalePoint()
+                           .domain(getKeys(data))
+                           .range([0, graphHeight])
+                           .padding(0.39);
+            
+            //set colors of bars using a d3 color scheme
+            var colorScale = d3.scaleOrdinal()
+                               .range(d3.schemeCategory20b);
+            
+            //create group element for each bar group 
+            var group = g.selectAll("g")
+                         .data(data)
+                         .enter()
+                         .append("g")
+                          .attr("transform", function(d, i) {
+                              if (Object.keys(data[0]).length < 4 && setBarHeight(data, schema.bar) == (100/3)) {
+                                    return "translate(0, " + Math.round((((106/3) + (100/3)*filterData(d).length)+(filterData(d).length-1))*i) + ")";
+                              } else if(Object.keys(data[0]).length > 6 && setBarHeight(data, schema.bar) == 20) {
+                                    return "translate(0, " + Math.round(((35 + (20*filterData(d).length)) + (filterData(d).length-1))*i) + ")";
+                              } else {
+                                    return "translate(0, " + Math.round((135+(filterData(d).length-1))*i) + ")";
+                              }
+                          });
+            
+            //create rectangle element, representing each bar in each bar group
+            var rect = group.selectAll("rect")
+                            .data(function(d) {return filterData(d);})
+                            .enter()
+                            .append("rect")
+                             .attr("fill", function(d, i) {return colorScale(i);})
+                             .attr("height", setBarHeight(data, schema.bar))
+                             .attr("width", function(d) {return xScale(d);})
+                             .attr("y", function(d, i) {return (setBarHeight(data, schema.bar)+1)*i;});
+            
+            //create tooltip and initially set to not display
+            var tooltip = d3.select("body").append("div")
+                            .attr("class", "tooltip").style("display", "none");
+            
+            //set event on hovering over each bar, causing tooltip to appear
+            rect.on("mousemove", function(d, i) {
+                tooltip.style("color", "white");
+                tooltip.style("display", "inline-block");
+                tooltip.style("left", (d3.event.pageX + 13) + "px");
+                tooltip.style("top", (d3.event.pageY - 18) + "px");
+                tooltip.html("5 Bedrooms <br /> Value: " + d);
+            });
+            
+            //set event on removing mouse from each bar, causing tooltip to disappear
+            rect.on("mouseout", function(d) {
+                tooltip.style("display", "none");
+            });
+            
+            //append bar value labels based on bar length & bar height
+            group.selectAll("text")
+                .data(function(d) {return filterData(d);})
+                .enter()
+                .append("text")
+                    .text(function(d) {
+                        if(schema.bar.dataLabels.showLabel){
+                            return d;
+                        }
+                    })
+                    .attr("x", function(d) {
+                        if (d >= 0 && d < 4 && schema.bar.dataLabels.location != "inside_start") {
+                            return (xScale(d) + 10);
+                        }
+                        if (schema.bar.dataLabels.location == "inside_start") {
+                    		return 10;
+                    	} else if (schema.bar.dataLabels.location == "inside_end") {
+                    		return (xScale(d) - this.getBBox().width - 10); 
+                    	} else if (schema.bar.dataLabels.location == "outside_end") {
+                    		return (xScale(d) + 10);
+                    	} else {
+                    		console.error('Unknown location. Please enter "inside_start", "inside_end", or "outside_end".');
+                    	}
+                    })
+                    .attr("y", function(d, i) {
+                        return (((setBarHeight(data, schema.bar))*(i*1.045))+(setBarHeight(data, schema.bar)/2 + 5));
+                    });
+            
+            //append x-axis
+            g.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + graphHeight + ")")
+                .call(d3.axisBottom(xScale));
+            
+            //append y-axis
+            g.append("g")
+                .attr("class", "y axis")
+                .call(d3.axisLeft(yScale));
+                
+
+        </script>
+    </body>
+</html>

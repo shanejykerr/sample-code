@@ -1,0 +1,138 @@
+<!-- html page for dashboard page. Utilized Nunjucks templating engine (https://mozilla.github.io/nunjucks/), noted by {%...%} lines and blocks -->
+
+{% extends 'layout.dash.view.html'  %}
+
+{% import "dash.tabs.macro.html" as tabs %}
+
+{% block pageTitle %}
+    <title>{{ _page.head.title }} | {{ _page.site.title }}</title>
+{% endblock %}
+
+{% block headCss %}
+<link href="/assets/custom/dash.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block leftPanel %}
+
+<h3>Selections</h3>
+
+<h5>Market Locations</h5>
+<select class="form-control filter-market" title="Add locations for comparison" data-selected-text-format="count"></select>
+
+<h5>KPI</h5>
+<select class="form-control kpi-select" >
+  <option value="tnb">Total Nights Booked</option>
+  <option value="tuna">Total Unit Nights Available</option>
+  <option value="tcr">Total Cancelled Reservations</option>
+  <option value="trev">Total Revenue</option>
+  <option value="trent">Total Rent</option>
+  <option value="textra">Total Extras</option>
+  <option value="tres">Total Reservations</option>
+  <option value="als">Average Length of Stay</option>
+  <option value="aabl">Booking Window</option>
+  <option value="occ">Occupancy Rate</option>
+  <option value="canc">Cancellation Rate</option>
+  <option value="abr">Average Booked Rate</option>
+  <option value="asr">Average Stay Value</option>
+  <option value="adr">Average Daily Rate</option>
+  <option value="revpan">Revenue Per Available Night</option>
+  <option value="trevpan">Total Revenue Per Available Night</option>
+  <option value="revpon">Revenue Per Occupied Night</option>
+</select>
+
+<h5>Category</h5>
+<select class="form-control category-select" title="Select Category"></select>
+
+<div>
+  <h3 class="filters-header">Filters</h3>
+  <a class="clear-filters hidden" href="javascript:;">Clear Filters</a>
+</div>
+
+<h5>Bedrooms</h5>
+<select class="form-control filter-bedroom_count" data-selected-text-format="count"></select>
+
+<h5>Bathrooms</h5>
+<select class="form-control filter-bathroom_count" data-selected-text-format="count"></select>
+
+<h5>Occupancy</h5>
+<select class="form-control filter-occupancy" data-selected-text-format="count"></select>
+
+<h5>Location</h5>
+<select class="form-control filter-property_location" data-selected-text-format="count"></select>
+
+<h5>Type</h5>
+<select class="form-control filter-property_structure" data-selected-text-format="count"></select>
+
+<h5>Amenities</h5>
+<select class="form-control filter-property_amenity" data-selected-text-format="count"></select>
+
+{% endblock %}
+
+{% block contentPanel %}
+
+
+
+<div class="row">
+  <div class="col-md-8">
+    <h3 class="detail-header">
+      <span class="header"><b>Detail View</b></span>
+
+    </h3>
+  </div>
+  <div class="col-md-4 pull-right date">
+    <div>
+      <p class="pull-right date-label">Select Dates:</p>
+      <br>
+      <div id="reportrange" class="btn default pull-right">
+          <div class="row">
+            <div class="col-sm-10">
+              <span class="primary"></span>
+              <span class="compare"></span>
+            </div>
+            <div class="col-sm-2">
+              <span class="glyphicon glyphicon-menu-down" aria-hidden="true"></span>
+            </div>
+          </div>
+
+      </div>
+    </div>
+
+   </div>
+
+</div>
+
+
+
+
+<hr style="border: solid 1px #000; margin-top: 0px;">
+<div class="data-wrapper">
+  <div class="alert alert-info loading" style="display: none" role="alert">
+      <a href="javascript:;" class="btn btn-lg">
+        <i class="fa fa-refresh fa-spin" style="font-size:24px;"></i> Loading data...
+      </a>
+  </div>
+
+  <div id="kpi-wrapper">
+    <div class="row market-row"></div>
+
+  </div>
+
+  <div id="d3-bar-chart"></div>
+  <canvas id="bar-chart" style="height: 400px; width: 700px; display: block;"></canvas>
+</div>
+
+
+{% endblock %}
+
+{% block footerPlugins %}
+<script src="/assets/custom/dp.js" type="text/javascript"></script>
+<script src="/assets/custom/chartjs.js" type="text/javascript"></script>
+<!-- <script src="/assets/custom/dashboard/dashboard.core.js" type="text/javascript"></script> -->
+<script src="/assets/custom/dashboard.detail.js" type="text/javascript"></script>
+{% endblock %}
+
+{% block footerScripts %}
+<script type="application/json" id="jsonStateObject">
+    {{ jsonStateObject }}
+</script>
+{% endblock %}

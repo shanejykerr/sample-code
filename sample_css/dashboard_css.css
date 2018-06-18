@@ -1,0 +1,91 @@
+/*Key Performance Indicators (KPI) Metrics styles*/
+.kpi-cntrl .kpi-header{
+    margin-bottom: 1em;
+}
+
+.kpi-cntrl .kpi-cell{
+    font-size: 42px;
+    font-weight: 300;
+    padding-right: 80px;
+    position:relative;
+    text-align: center;
+    cursor: pointer;
+}
+.kpi-cntrl .kpi-cell sup{
+  font-size: 50%;
+  top:-0.7em;
+}
+
+.kpi-cntrl .kpi-cell sup.sm{
+  font-size: 38%;
+  top:-1.1em;
+}
+
+.kpi-cntrl .kpi-change{
+  /*fa-long-arrow-up*/
+  bottom:6px;
+  top: 12px;
+  font-size: 16px;
+  line-height: 1.42em;
+  max-width: 100px;
+  position:absolute;
+  right:18px;
+}
+
+.kpi-cntrl .kpi-change.down{
+  color: #c13030;
+}
+/*.kpi-cntrl .kpi-change.down::before{
+  content:"-";
+}*/
+
+.kpi-cntrl .kpi-change.up{
+  color: green;
+}
+/*.kpi-cntrl .kpi-change.up::before{
+  content:"+";
+}*/
+/*small and medium cells*/
+.kpi-cntrl .kpi-cell.kpi-md{
+  font-size: 38px;
+  line-height: 1em;
+  padding-bottom: 10px;
+  padding-top: 24px;
+
+}
+
+.kpi-cntrl .kpi-cell.kpi-sm{
+    font-size: 30px;
+    line-height: 1em;
+    padding-bottom: 11px;
+    padding-top: 4px;
+}
+
+.kpi-display-row.ddl {
+  background-color: #eff3f8;
+
+}
+
+.kpi-display-row {
+  /*margin-top: 20px;*/
+  background-color: #f5f7fa;
+  /*margin-top: 0px;*/
+  padding-top: 20px;
+}
+
+
+.kpi-display-row:nth-child(even) {
+  background-color: #fff;
+}
+
+
+.kpi-display-ddl span.period {
+  margin-left: 100px;
+  padding-top: 10px;
+}
+
+.kpi-display-ddl span.compare {
+  margin-right: 10px;
+}
+
+/* detail dashboard */
